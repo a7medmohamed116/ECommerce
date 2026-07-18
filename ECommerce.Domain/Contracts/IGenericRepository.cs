@@ -18,6 +18,7 @@ namespace ECommerce.Domain.Contracts
 
         Task<IReadOnlyList<TEntity>>GetAllAsync(CancellationToken ct = default);
         Task<IReadOnlyList<TEntity>> GetAllAsync(ISpecification<TEntity,TKey> spec,CancellationToken ct = default);
+        Task<int> Countasync(ISpecification<TEntity , TKey> spec , CancellationToken ct =default); //spec with just brand , type , search only  so do a new specclass
 
 
     }

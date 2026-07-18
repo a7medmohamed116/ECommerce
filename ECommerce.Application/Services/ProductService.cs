@@ -31,12 +31,15 @@ namespace ECommerce.Application.Services
             return Result<IReadOnlyList<BrandDto>>.OK(mapped);
         }
 
-        public async Task<Result<IReadOnlyList<ProductDto>>> GetAllProductsAsync(ProductQueryParams queryParams, CancellationToken ct = default)
+        public async Task<Result<PaginatedResult<ProductDto>>> GetAllProductsAsync(ProductQueryParams queryParams, CancellationToken ct = default) // instead of return ireadonlylist we will retuen paginatedresult so can show response with index , size ,count,data
         {
             var spec = new ProductWithBrandAndTypeSpec(queryParams);  
             var products = await _unitOfWork.GetRepository<Product, int>().GetAllAsync(spec ,ct);
             var data = _mapper.Map<IReadOnlyList<ProductDto>>(products);
-            return Result<IReadOnlyList<ProductDto>>.OK(data);
+            var countspec = new ProductCountSpecification(queryParams);
+            var countofallspecproducts = await _unitOfWork.GetRepository<Product,int>().Countasync(countspec, ct);
+            var result =  new PaginatedResult<ProductDto>(queryParams.PageIndex,queryParams.PageSize, countofallspecproducts, data);//products.Count [i already konw i got  4 products in pagesize 4 etc]is wrong cause i need count all products in specific certirea (بيدج سابز 4 تمام لكن الكاونت الي محقق الكونديشن المعين  هيكون 13 مثلا لو بجيت كل البرودكتس) //do new method in generic repo to count with new spec class productcountspec
+            return Result<PaginatedResult<ProductDto>>.OK(result);
         }
 
         public async Task<Result<IReadOnlyList<TypeDto>>> GetAllTypesAsync(CancellationToken ct = default)

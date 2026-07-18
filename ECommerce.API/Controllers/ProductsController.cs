@@ -18,11 +18,11 @@ namespace ECommerce.API.Controllers
         }
         //Get baseurl/api/products
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<ProductDto>>>GetAllProducts( [FromQuery] ProductQueryParams queryParams ,CancellationToken ct = default)//int? brandId ,int? typeId the pramters too match with serarch , oreder and paganation so go to queryparams
+        public async Task<ActionResult<PaginatedResult<ProductDto>>>GetAllProducts( [FromQuery] ProductQueryParams queryParams ,CancellationToken ct = default)//int? brandId ,int? typeId the pramters too match with serarch , oreder and paganation so go to queryparams
         {
             var result = await _productService.GetAllProductsAsync(queryParams, ct);//|| above in controller we pass the data as object ProductQueryParams queryParams so will deal with it as body and no body in get  request so error must say [FromQuery]
             return ToActionResult(result);
-            }
+        }
         // baseurl/api/products/{id}
         [HttpGet ("{id}")] 
         public async Task<ActionResult<ProductDto>>GetProduct(int id ,CancellationToken ct = default)
