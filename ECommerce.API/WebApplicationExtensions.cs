@@ -9,7 +9,9 @@ namespace ECommerce.API
             using var scope = app.Services.CreateScope();
             var logger = scope.ServiceProvider.GetRequiredService<ILogger<WebApplication>>();
             var seeder = scope.ServiceProvider.GetRequiredKeyedService<IDataSeeder>("Catalog");
+            var Identityseeder = scope.ServiceProvider.GetRequiredKeyedService<IDataSeeder>("Identity");
             await seeder.SeedDataAsync();
+            await Identityseeder.SeedDataAsync();
             return app;
 
 

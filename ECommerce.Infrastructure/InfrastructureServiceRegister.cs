@@ -1,7 +1,12 @@
-﻿using ECommerce.Domain.Contracts;
+﻿using ECommerce.Application.Contracts;
+using ECommerce.Domain.Contracts;
 using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Data.DataSeeding;
+using ECommerce.Infrastructure.Identity.Data;
+using ECommerce.Infrastructure.Identity.Entities;
+using ECommerce.Infrastructure.Identity.Services;
 using ECommerce.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,17 +21,27 @@ namespace ECommerce.Infrastructure
 {
     public static class InfrastructureServiceRegister
     {
-        public static IServiceCollection AddInfrastructureServices(this IServiceCollection services , IConfiguration configuration)
+        public static async Task<IServiceCollection> AddInfrastructureServices(this IServiceCollection services , IConfiguration configuration)
         {
             services.AddDbContext<StoreDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
             });
+
+
+
+            services.AddDbContext<StoreIdentityDbContext>(options =>
+            {
+                options.UseSqlServer(configuration.GetConnectionString("IdentityConnection"));
+            });
             
 
             //services.AddScoped<IDataSeeder, CatalogDataSeed>();//issue
-            //services.AddScoped<IDataSeeder, ÷identityDataSeed>();// مثلا ف وقتها هتعمل اوفريد وهتضرب ف لا اديها كيي//
-            services.AddKeyedScoped<IDataSeeder, CatalogDataSeed>("Catalog");//issue
+            //services.AddScoped<IDataSeeder, ÷identityDataSeed>();// مثلا 
+            services.AddKeyedScoped<IDataSeeder, CatalogDataSeed>("Catalog");
+            services.AddKeyedScoped<IDataSeeder, IdentityDataSeeder>("Identity");
+
+
             services.AddScoped<IUnitOfWork,UnitOfWork>();
             services.AddScoped(typeof(IGenericRepository<,>),typeof( GenericRepository<,>));
             //add redis database must be singleton run one 
@@ -37,8 +52,12 @@ namespace ECommerce.Infrastructure
 
             services.AddScoped<IBasketRepository, BasketRepository>();
             services.AddScoped<ICacheRepository, CacheRepository>();
-            
 
+
+            services.AddIdentityCore<ApplicationUser>().AddRoles<IdentityRole>().AddEntityFrameworkStores<StoreIdentityDbContext>();//
+
+            services.AddScoped<IIdentityService, IdentityService>();/////
+                    
             return services;
         }
     }
