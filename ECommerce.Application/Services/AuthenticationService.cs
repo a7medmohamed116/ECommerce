@@ -15,7 +15,7 @@ namespace ECommerce.Application.Services
 
         private readonly IIdentityService _identityService;
 
-        public AuthenticationService(IIdentityService identityService)
+        public AuthenticationService(IIdentityService identityService )
         {
             _identityService = identityService;
         }
@@ -24,6 +24,7 @@ namespace ECommerce.Application.Services
             
             // to much to Find user by email.Verify the password.Generate a JWT token. Return the user information. in one servic 
             // aslo will need the same validators in the register service so we will divide the serive 
+            //need usermanager
             // find user by email and check email check password in new interface [IIdentityService]  return identityuserresult that initialized in common 
         #endregion
 
@@ -36,7 +37,7 @@ namespace ECommerce.Application.Services
             if (!user.IsSuccess) return Result<UserDto>.Fail(user.Errors);
             //Verify the password
             var checkPassword = await _identityService.CheckPasswordAsync(loginDto.Email, loginDto.Password, ct);
-            if(!checkPassword.IsSuccess) return Result<UserDto>.Fail(checkPassword.Errors);
+            if(!checkPassword.IsSuccess) return Result<UserDto>.Fail(checkPassword.Errors);//system errors, not "wrong password" errors
             if (!checkPassword.data) return Result<UserDto>.Fail(Error.Unauthorized("Invalid Email Or Password!"));
             //Generate a JWT token.
 
@@ -48,6 +49,25 @@ namespace ECommerce.Application.Services
                 DisplayName = user.data.DisplayName
             };
             return Result<UserDto>.OK(returnedLoginuser);
+        }
+
+        public async Task<Result<UserDto>> RegisterAsync(RegisterDto registerDto, CancellationToken ct = default)
+        {
+            var user = await _identityService.CreateNewUserAsync(registerDto, ct);
+            if (!user.IsSuccess)
+            {
+                return Result<UserDto>.Fail(user.Errors);
+            }
+
+            var returnedRegisteruser = new UserDto()
+            {
+                Email = user.data.Email,
+                Token = "JWT",
+                DisplayName = user.data.DisplayName
+            };
+            return Result<UserDto>.OK(returnedRegisteruser);
+
+
         }
     }
 }
