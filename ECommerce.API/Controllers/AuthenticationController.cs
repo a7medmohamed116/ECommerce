@@ -16,5 +16,12 @@ namespace ECommerce.API.Controllers
         [HttpPost("Login")]
         public async Task<ActionResult<UserDto>> Login(LoginDto loginDto, CancellationToken ct = default)
             => ToActionResult(await _authenticationService.LoginAsync(loginDto, ct));
+
+
+        [HttpPost("Register")]
+        public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto, CancellationToken ct = default)
+            => ToActionResult(await _authenticationService.RegisterAsync(registerDto, ct));
+
+        
     }
 }
