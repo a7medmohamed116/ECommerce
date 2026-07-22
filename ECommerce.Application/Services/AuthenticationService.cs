@@ -53,6 +53,12 @@ namespace ECommerce.Application.Services
 
         public async Task<Result<UserDto>> RegisterAsync(RegisterDto registerDto, CancellationToken ct = default)
         {
+            var checkexistuser = await _identityService.FindUserByEmailAsync(registerDto.Email, ct);
+            if (checkexistuser.IsSuccess)
+            {
+                return Result<UserDto>.Fail(Error.Validation("General.Validation", "Email Already Exist Please Login"));
+            }
+
             var user = await _identityService.CreateNewUserAsync(registerDto, ct);
             if (!user.IsSuccess)
             {
