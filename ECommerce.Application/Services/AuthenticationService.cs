@@ -14,10 +14,12 @@ namespace ECommerce.Application.Services
     {
 
         private readonly IIdentityService _identityService;
+        private readonly ITokenService _tokenService;
 
-        public AuthenticationService(IIdentityService identityService )
+        public AuthenticationService(IIdentityService identityService ,ITokenService tokenService )
         {
             _identityService = identityService;
+            _tokenService = tokenService;
         }
 
         #region Good code
@@ -40,12 +42,13 @@ namespace ECommerce.Application.Services
             if(!checkPassword.IsSuccess) return Result<UserDto>.Fail(checkPassword.Errors);//system errors, not "wrong password" errors
             if (!checkPassword.data) return Result<UserDto>.Fail(Error.Unauthorized("Invalid Email Or Password!"));
             //Generate a JWT token.
-
+            var roles = await _identityService.GetUserRoles(user.data.Email, ct);
+            var token = _tokenService.CreateToken(user.data.Id, user.data.Email, user.data.UserName,roles.data);
             //Return Data
             var returnedLoginuser = new UserDto()
             {
                 Email = loginDto.Email,
-                Token = "JWT",
+                Token = token,
                 DisplayName = user.data.DisplayName
             };
             return Result<UserDto>.OK(returnedLoginuser);
@@ -64,11 +67,12 @@ namespace ECommerce.Application.Services
             {
                 return Result<UserDto>.Fail(user.Errors);
             }
-
+            var roles = await _identityService.GetUserRoles(user.data.Email, ct);
+            var token = _tokenService.CreateToken(user.data.Id, user.data.Email, user.data.UserName, roles.data);
             var returnedRegisteruser = new UserDto()
             {
                 Email = user.data.Email,
-                Token = "JWT",
+                Token = token,
                 DisplayName = user.data.DisplayName
             };
             return Result<UserDto>.OK(returnedRegisteruser);

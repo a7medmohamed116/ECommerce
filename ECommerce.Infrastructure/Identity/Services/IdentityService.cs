@@ -57,5 +57,16 @@ namespace ECommerce.Infrastructure.Identity.Services
 
             
         }
+
+        public async Task<Result<IReadOnlyList<string>>> GetUserRoles(string email, CancellationToken ct = default)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user is null)
+                return Result<IReadOnlyList<string>>.Fail(Error.NotFound("Not Found", "User Not Found"));
+            var roles = await _userManager.GetRolesAsync(user);
+            return Result<IReadOnlyList<string>>.OK(roles.ToList());
+
+
+        }
     }
 }
