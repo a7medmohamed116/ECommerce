@@ -2,6 +2,7 @@
 using ECommerce.Application.Common;
 using ECommerce.Application.Contracts;
 using ECommerce.Application.DTOs.ProductDTOs;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -26,6 +27,7 @@ namespace ECommerce.API.Controllers
             return ToActionResult(result);
         }
         // baseurl/api/products/{id}
+        [Authorize]
         [HttpGet ("{id}")] 
         public async Task<ActionResult<ProductDto>>GetProduct(int id ,CancellationToken ct = default)
         {

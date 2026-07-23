@@ -6,10 +6,12 @@ using ECommerce.Infrastructure.Identity.Data;
 using ECommerce.Infrastructure.Identity.Entities;
 using ECommerce.Infrastructure.Identity.Services;
 using ECommerce.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using System;
 using System.Collections.Generic;
@@ -23,6 +25,8 @@ namespace ECommerce.Infrastructure
     {
         public static async Task<IServiceCollection> AddInfrastructureServices(this IServiceCollection services , IConfiguration configuration)
         {
+            var jwtSettings = new JwtSettings();
+            
             services.AddDbContext<StoreDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
@@ -58,6 +62,29 @@ namespace ECommerce.Infrastructure
 
             services.AddScoped<IIdentityService, IdentityService>();/////
             services.AddScoped<ITokenService, TokenService>();
+
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme; // token successded
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme; //request failed
+            }).AddJwtBearer(opt =>
+            {
+                opt.SaveToken = true;
+                //validations
+                opt.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = jwtSettings.Issuer,
+                    ValidateAudience = true,
+                    ValidAudience = jwtSettings.Audience,
+                    ValidateLifetime = true,
+                    RequireExpirationTime = true,
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                    ClockSkew = TimeSpan.Zero
+                };
+            });
+
             return services;
         }
     }

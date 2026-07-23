@@ -64,7 +64,7 @@ namespace ECommerce.Infrastructure.Identity.Services
 
 
         }
-    }
+    }//then register the schema 
 
 
     public class JwtSettings
