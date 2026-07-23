@@ -23,10 +23,10 @@ namespace ECommerce.Infrastructure
 {
     public static class InfrastructureServiceRegister
     {
-        public static async Task<IServiceCollection> AddInfrastructureServices(this IServiceCollection services , IConfiguration configuration)
+        public static async Task<IServiceCollection> AddInfrastructureServices(this IServiceCollection services, IConfiguration configuration)
         {
-            var jwtSettings = new JwtSettings();
-            
+            //var jwtSettings = new JwtSettings(); issue wrong => get new object with null values
+
             services.AddDbContext<StoreDbContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection"));
@@ -38,7 +38,7 @@ namespace ECommerce.Infrastructure
             {
                 options.UseSqlServer(configuration.GetConnectionString("IdentityConnection"));
             });
-            
+
 
             //services.AddScoped<IDataSeeder, CatalogDataSeed>();//issue
             //services.AddScoped<IDataSeeder, ÷identityDataSeed>();// مثلا 
@@ -46,8 +46,8 @@ namespace ECommerce.Infrastructure
             services.AddKeyedScoped<IDataSeeder, IdentityDataSeeder>("Identity");
 
 
-            services.AddScoped<IUnitOfWork,UnitOfWork>();
-            services.AddScoped(typeof(IGenericRepository<,>),typeof( GenericRepository<,>));
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
             //add redis database must be singleton run one 
             services.AddSingleton<IConnectionMultiplexer>(config =>
             {
@@ -62,6 +62,9 @@ namespace ECommerce.Infrastructure
 
             services.AddScoped<IIdentityService, IdentityService>();/////
             services.AddScoped<ITokenService, TokenService>();
+
+            var jwtSettings = configuration.GetSection("JWT").Get<JwtSettings>() ?? throw new InvalidOperationException("JWT Settings Error"); // get the data and put it class
+
 
             services.AddAuthentication(opt =>
             {
