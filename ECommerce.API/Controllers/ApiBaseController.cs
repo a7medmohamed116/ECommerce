@@ -1,6 +1,7 @@
 ﻿using ECommerce.Application.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ECommerce.API.Controllers
 {
@@ -58,6 +59,13 @@ namespace ECommerce.API.Controllers
 
             return new ObjectResult(problem) { StatusCode = statuscode };
         }
+        protected string? GetUserEmail()
+        {
+            return HttpContext.User.FindFirstValue(ClaimTypes.Email);
+             
+        } 
+
+        
 
     }
 }

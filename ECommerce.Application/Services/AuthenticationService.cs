@@ -22,12 +22,19 @@ namespace ECommerce.Application.Services
             _tokenService = tokenService;
         }
 
+        public async Task<Result<bool>> CheckExistAsync(string email, CancellationToken ct = default)
+        {
+            var emailexist = await _identityService.CheckEmailExistAsync(email, ct);
+            if (!emailexist.IsSuccess) return Result<bool>.Fail(emailexist.Errors);
+            return Result<bool>.OK(emailexist.data);
+        }
+
         #region Good code
-            
-            // to much to Find user by email.Verify the password.Generate a JWT token. Return the user information. in one servic 
-            // aslo will need the same validators in the register service so we will divide the serive 
-            //need usermanager
-            // find user by email and check email check password in new interface [IIdentityService]  return identityuserresult that initialized in common 
+
+        // to much to Find user by email.Verify the password.Generate a JWT token. Return the user information. in one servic 
+        // aslo will need the same validators in the register service so we will divide the serive 
+        //need usermanager
+        // find user by email and check email check password in new interface [IIdentityService]  return identityuserresult that initialized in common 
         #endregion
 
 

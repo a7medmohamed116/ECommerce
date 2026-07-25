@@ -3,6 +3,7 @@ using ECommerce.Application.Contracts;
 using ECommerce.Application.DTOs.IdentityDTOs;
 using ECommerce.Infrastructure.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,6 +19,14 @@ namespace ECommerce.Infrastructure.Identity.Services
         public IdentityService(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
+        }
+
+        public async Task<Result<bool>> CheckEmailExistAsync(string email, CancellationToken ct = default)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+           
+            return Result<bool>.OK(user is not null);
+
         }
 
         public async Task<Result<bool>> CheckPasswordAsync(string email, string password, CancellationToken ct = default)

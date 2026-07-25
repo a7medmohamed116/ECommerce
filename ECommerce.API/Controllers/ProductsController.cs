@@ -27,7 +27,7 @@ namespace ECommerce.API.Controllers
             return ToActionResult(result);
         }
         // baseurl/api/products/{id}
-        [Authorize]
+        [Authorize( Roles="SuperAdmin")]
         [HttpGet ("{id}")] 
         public async Task<ActionResult<ProductDto>>GetProduct(int id ,CancellationToken ct = default)
         {
@@ -53,7 +53,7 @@ namespace ECommerce.API.Controllers
             var result = await _productService.GetAllTypesAsync(ct);
             return ToActionResult(result);
         }
-
+       
 
     }
 }

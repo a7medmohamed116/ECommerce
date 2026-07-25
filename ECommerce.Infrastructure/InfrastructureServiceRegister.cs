@@ -1,4 +1,5 @@
-﻿using ECommerce.Application.Contracts;
+﻿using Azure.Core;
+using ECommerce.Application.Contracts;
 using ECommerce.Domain.Contracts;
 using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Data.DataSeeding;
@@ -7,6 +8,7 @@ using ECommerce.Infrastructure.Identity.Entities;
 using ECommerce.Infrastructure.Identity.Services;
 using ECommerce.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -87,6 +89,35 @@ namespace ECommerce.Infrastructure
                     ClockSkew = TimeSpan.Zero
                 };
             });
+            #region prosses of token with middleware and [Authorize]
+            // decode the created token and check the data match or no then 
+            //after check asp.net create object HttpContext.User kind of ClaimsPrincipal 
+            //  ClaimsPrincipal
+            //├── NameIdentifier = 15
+            //├── Email = ahmed@gmail.com
+            //├── Name = Ahmed
+            //└── Role = Admin
+            // in any controller can do var user = HttpContext.User; and reach data
+            // why Authorize work 
+            //    Request
+            //     │
+            //     ▼
+            //JWT Middleware // decode the token and validate data
+            //     │
+            //  Token
+            //     │
+            //     ▼
+            // ClaimsPrincipal
+            //     │
+            //     ▼
+            //HttpContext.User
+            //     │
+            //     ▼
+            //Authorize Attribute
+            // if data in HttpContext.User go in if no 401 Unauthorized HttpContext.User if has role superadmin go in else 403 Forbidden
+            // if [Authorize (Roles = "SuperAdmin")] check 
+            #endregion
+
 
             return services;
         }
