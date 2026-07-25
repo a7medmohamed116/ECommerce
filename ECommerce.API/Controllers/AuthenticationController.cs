@@ -29,6 +29,15 @@ namespace ECommerce.API.Controllers
             var checkRegistredEmail = await _authenticationService.CheckExistAsync(email, ct);
             return ToActionResult(checkRegistredEmail);
         }
+        [Authorize]
+        [HttpGet("CurrentUser")]
+        public async Task<ActionResult<UserDto>> GetCurrentUser(CancellationToken ct = default)
+        {
+            var email = GetUserEmail()!;
+            var user = await _authenticationService.GetCurrentUser(email, ct);
+            return ToActionResult(user);
+        }
+       
 
     }
 }

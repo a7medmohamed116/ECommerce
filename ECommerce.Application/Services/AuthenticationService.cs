@@ -29,6 +29,13 @@ namespace ECommerce.Application.Services
             return Result<bool>.OK(emailexist.data);
         }
 
+        public async Task<Result<UserDto>> GetCurrentUser(string email, CancellationToken ct = default)
+        {
+            var user = await _identityService.FindUserByEmailAsync(email, ct);
+            if(!user.IsSuccess) return Result<UserDto>.Fail(user.Errors);
+            return Result<UserDto>.OK(new UserDto() { DisplayName = user.data.DisplayName, Email = user.data.Email});
+        }
+
         #region Good code
 
         // to much to Find user by email.Verify the password.Generate a JWT token. Return the user information. in one servic 
