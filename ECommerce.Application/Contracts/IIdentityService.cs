@@ -16,5 +16,6 @@ namespace ECommerce.Application.Contracts
         Task<Result<IReadOnlyList<string>>> GetUserRoles(string email, CancellationToken ct = default);
         Task<Result<bool>> CheckEmailExistAsync(string email, CancellationToken ct = default);
         Task<Result<AddressDto>> GetUserAddress(string email, CancellationToken ct = default);
+        Task<Result<AddressDto>> UpdateAddress(AddressDto addressDto ,string email,CancellationToken ct = default);
     }
 }

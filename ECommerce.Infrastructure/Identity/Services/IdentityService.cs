@@ -1,6 +1,7 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.Contracts;
 using ECommerce.Application.DTOs.IdentityDTOs;
+using ECommerce.Infrastructure.Identity.Data;
 using ECommerce.Infrastructure.Identity.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,8 +17,7 @@ namespace ECommerce.Infrastructure.Identity.Services
     public class IdentityService : IIdentityService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-
-        public IdentityService(UserManager<ApplicationUser> userManager)
+        public IdentityService(UserManager<ApplicationUser> userManager )
         {
             _userManager = userManager;
         }
@@ -70,7 +70,7 @@ namespace ECommerce.Infrastructure.Identity.Services
 
         public async Task<Result<AddressDto>> GetUserAddress(string email, CancellationToken ct = default)
         {
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = _userManager.Users.Include(X => X.Address).FirstOrDefault(X => X.Email == email);
             if (user.Address is null)
                 return Result<AddressDto>.Fail(Error.NotFound("Address.NotFound", "Address not found"));
             var address = new AddressDto()
@@ -78,7 +78,8 @@ namespace ECommerce.Infrastructure.Identity.Services
                 City = user.Address.City,
                 Street = user.Address.Street,
                 FirstName = user.Address.FirstName,
-                LastName = user.Address.LastName
+                LastName = user.Address.LastName,
+                Country = user.Address.Country
             };
             return Result<AddressDto>.OK(address);
             
@@ -94,6 +95,49 @@ namespace ECommerce.Infrastructure.Identity.Services
             var roles = await _userManager.GetRolesAsync(user);
             return Result<IReadOnlyList<string>>.OK(roles.ToList());
 
+
+        }
+
+        public async Task<Result<AddressDto>> UpdateAddress(AddressDto addressDto, string email, CancellationToken ct = default)
+        {
+            var user = _userManager.Users.Include(X => X.Address).FirstOrDefault(X => X.Email == email);
+            if (user.Address == null)
+            {
+
+                user.Address = new Address
+                {
+                    FirstName = addressDto.FirstName,
+                    LastName = addressDto.LastName,
+                    Street = addressDto.Street,
+                    City = addressDto.City,
+                    Country = addressDto.Country
+
+                };
+
+            }
+            else
+            {
+                
+                user.Address.FirstName = addressDto.FirstName;
+                user.Address.LastName = addressDto.LastName;
+                user.Address.Street = addressDto.Street;
+                user.Address.City = addressDto.City;
+                user.Address.Country = addressDto.Country;
+                
+            }
+            var address = user.Address;
+           
+            var result = await _userManager.UpdateAsync(user);
+            
+            //await _dbContext.SaveChangesAsync(ct);
+            
+            if (!result.Succeeded)
+            {
+                var errors = result.Errors.Select(X => new Error(X.Code, X.Description)).ToList();
+                return Result<AddressDto>.Fail(errors);
+            }
+            return Result<AddressDto>.OK(new AddressDto() { City = address.City, FirstName = address.FirstName, LastName = address.LastName, Street = address.Street  ,Country = address.Country});
+            
 
         }
     }

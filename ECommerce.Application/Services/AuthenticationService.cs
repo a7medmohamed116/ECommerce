@@ -105,5 +105,15 @@ namespace ECommerce.Application.Services
 
 
         }
+
+        public async Task<Result<AddressDto>> UpdateUserAddress(AddressDto addressDto ,string email, CancellationToken ct = default)
+        {
+            var result = await _identityService.UpdateAddress(addressDto, email);
+            if (!result.IsSuccess)
+            {
+                return Result<AddressDto>.Fail(result.Errors);
+            }
+            return Result<AddressDto>.OK(result.data);
+        }
     }
 }

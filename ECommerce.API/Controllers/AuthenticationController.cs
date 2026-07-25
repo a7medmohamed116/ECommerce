@@ -45,7 +45,15 @@ namespace ECommerce.API.Controllers
             var result = await _authenticationService.GetUserAddress(GetUserEmail(), ct);
             return ToActionResult(result);
         }
-       
+
+        [Authorize]
+        [HttpPost("Address")]
+        public async Task<ActionResult<AddressDto>> UpdateAddress( AddressDto addressDto,CancellationToken ct = default)
+        {
+            var result = await _authenticationService.UpdateUserAddress(addressDto, GetUserEmail());
+            return ToActionResult(result);
+        }
+
 
     }
 }
