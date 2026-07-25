@@ -37,6 +37,14 @@ namespace ECommerce.API.Controllers
             var user = await _authenticationService.GetCurrentUser(email, ct);
             return ToActionResult(user);
         }
+
+        [Authorize]
+        [HttpGet("Address")]
+        public async Task<ActionResult<AddressDto>>GetAddress(CancellationToken ct = default)
+        {
+            var result = await _authenticationService.GetUserAddress(GetUserEmail(), ct);
+            return ToActionResult(result);
+        }
        
 
     }

@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -64,6 +65,24 @@ namespace ECommerce.Infrastructure.Identity.Services
             return Result<IdentityUserResult>.OK(returneduser);
             
 
+            
+        }
+
+        public async Task<Result<AddressDto>> GetUserAddress(string email, CancellationToken ct = default)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user.Address is null)
+                return Result<AddressDto>.Fail(Error.NotFound("Address.NotFound", "Address not found"));
+            var address = new AddressDto()
+            {
+                City = user.Address.City,
+                Street = user.Address.Street,
+                FirstName = user.Address.FirstName,
+                LastName = user.Address.LastName
+            };
+            return Result<AddressDto>.OK(address);
+            
+                
             
         }
 
