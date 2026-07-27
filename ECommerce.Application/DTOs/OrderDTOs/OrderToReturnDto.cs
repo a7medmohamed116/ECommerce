@@ -18,6 +18,6 @@ namespace ECommerce.Application.DTOs.OrderDTOs
         public string Status { get; set; } = default!;
         public decimal SubTotal { get; set; }
         public decimal DeliveryMethodCost { get; set; }
-        public decimal Total { get; set; }
+        public decimal Total { get; set; } 
     }
 }

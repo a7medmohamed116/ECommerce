@@ -1,5 +1,6 @@
 
 using ECommerce.Application;
+using ECommerce.Application.Profiels;
 using ECommerce.Infrastructure;
 using ECommerce.Infrastructure.Identity.Services;
 
@@ -19,7 +20,7 @@ namespace ECommerce.API
             builder.Services.AddApplicationServices();//
 
             builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JWT")); //read this section and confert it as jwtsetting object register
-
+            builder.Services.Configure<UrlSettings>(builder.Configuration.GetSection("UrlSettings"));
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
