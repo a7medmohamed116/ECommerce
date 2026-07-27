@@ -14,7 +14,7 @@ namespace ECommerce.Application.Profiels
     {
         public OrderProfiels()
         {
-            //CreateMap<AddressDto, OrderAddress>().ReverseMap();
+            CreateMap<AddressDto, OrderAddress>().ReverseMap();
             CreateMap<Order, OrderToReturnDto>()
                 .ForMember(dest => dest.DeliveryMethod, opt => opt.MapFrom(src => src.DeliveryMethod.ShortName))
                 .ForMember(dest => dest.DeliveryMethodCost, opt => opt.MapFrom(src => src.DeliveryMethod.Price));

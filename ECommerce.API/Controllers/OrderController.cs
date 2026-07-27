@@ -15,7 +15,7 @@ namespace ECommerce.API.Controllers
         }
 
         [Authorize]
-        [HttpPost("Order")]
+        [HttpPost]
         public async Task<ActionResult<OrderToReturnDto>> CreateOrder(OrderDto orderDto ,CancellationToken ct = default)
         {
             var order = await _orderService.CreateOrderAsync(orderDto, GetUserEmail()!, ct);
