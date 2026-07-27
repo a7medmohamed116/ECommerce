@@ -61,7 +61,7 @@ namespace ECommerce.API.Controllers
         }
         protected string? GetUserEmail()
         {
-            return HttpContext.User.FindFirstValue(ClaimTypes.Email);
+            return HttpContext.User.FindFirstValue(ClaimTypes.Email) ?? throw new UnauthorizedAccessException("No email cliam found");
              
         } 
 
