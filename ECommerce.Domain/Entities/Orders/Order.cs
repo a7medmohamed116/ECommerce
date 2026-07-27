@@ -17,7 +17,7 @@ namespace ECommerce.Domain.Entities.Orders
             DeliveryMethod = deliveryMethod;
         }
 
-        private Order() // Empty parameterless ctor for EF Core
+        private Order() // Empty parameterless ctor for EF Core // Order موجود بالفعل في قاعدة البيانات  إعادة تكوين
         {
             
         }
