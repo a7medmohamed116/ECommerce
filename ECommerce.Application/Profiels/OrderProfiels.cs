@@ -24,8 +24,11 @@ namespace ECommerce.Application.Profiels
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.ProductName))
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Product.Description))
                 .ForMember(dest => dest.PictureUrl, opt => opt.MapFrom<OrderPictureUrlResolver>());
-                //images / ../product1.png XXXX
-                //should be  : https://localhost:7200/images by resolver
+            //images / ../product1.png XXXX
+            //should be  : https://localhost:7200/images by resolver
+
+
+            CreateMap<DeliveryMethod, DeliveryMethodDto>();
         }
     }
 }

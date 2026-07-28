@@ -9,6 +9,7 @@ using ECommerce.Domain.Entities.Orders;
 using ECommerce.Domain.Entities.Products;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -93,6 +94,45 @@ namespace ECommerce.Application.Services
             {
                 await _basketRepository.DeleteBasketAsync(orderDto.BasketId,ct);
                 return Result<OrderToReturnDto>.OK(_mapper.Map<OrderToReturnDto>(order));
+            }
+        }
+
+        public async Task<Result<IReadOnlyList<DeliveryMethodDto>>> GetDeliveyMethods(CancellationToken ct = default)
+        {
+            var DeliveryMethods = await _unitOfWork.GetRepository<DeliveryMethod, int>().GetAllAsync(ct);
+            if (DeliveryMethods.Any())
+            {
+                return Result<IReadOnlyList<DeliveryMethodDto>>.OK(_mapper.Map<IReadOnlyList<DeliveryMethodDto>>(DeliveryMethods));
+            }
+            else
+            {
+                return Result<IReadOnlyList<DeliveryMethodDto>>.Fail(Error.NotFound(Description: "No DeliveryMethods Found"));
+            }
+        }
+
+        public async Task<Result<OrderToReturnDto>> GetOrderByIdAndEmailUser(Guid OrderId, string email, CancellationToken ct = default)
+        {
+            var order =await _unitOfWork.GetRepository<Order,Guid>().GetByIdAsync(new OrederSpecification(OrderId,email),ct);
+            if (order is not null)
+            {
+                return Result<OrderToReturnDto>.OK(_mapper.Map<OrderToReturnDto>(order));
+            }
+            else
+            {
+                return Result<OrderToReturnDto>.Fail(Error.NotFound(Description: "Order Not Found"));
+            }
+        }
+
+        public async Task<Result<IReadOnlyList<OrderToReturnDto>>> GetOrdersForSpecificUser(string email, CancellationToken ct = default)
+        {
+            var orders = await _unitOfWork.GetRepository<Order,Guid>().GetAllAsync(new OrederSpecification(email),ct);
+            if (orders.Any())
+            {
+                return Result<IReadOnlyList<OrderToReturnDto>>.OK(_mapper.Map<IReadOnlyList<OrderToReturnDto>>(orders));
+            }
+            else
+            {
+                return Result<IReadOnlyList<OrderToReturnDto>>.Fail(Error.NotFound(Description: "Orders Not Found"));
             }
         }
     }
