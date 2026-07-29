@@ -1,11 +1,14 @@
 ﻿using Azure.Core;
+using ECommerce.Application.Common;
 using ECommerce.Application.Contracts;
+using ECommerce.Application.Services;
 using ECommerce.Domain.Contracts;
 using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Data.DataSeeding;
 using ECommerce.Infrastructure.Identity.Data;
 using ECommerce.Infrastructure.Identity.Entities;
 using ECommerce.Infrastructure.Identity.Services;
+using ECommerce.Infrastructure.Payments;
 using ECommerce.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http;
@@ -117,6 +120,10 @@ namespace ECommerce.Infrastructure
             // if data in HttpContext.User go in if no 401 Unauthorized HttpContext.User if has role superadmin go in else 403 Forbidden
             // if [Authorize (Roles = "SuperAdmin")] check 
             #endregion
+
+
+
+            services.AddScoped<IPaymentGateway, StripePaymentGateway>();
 
 
             return services;
