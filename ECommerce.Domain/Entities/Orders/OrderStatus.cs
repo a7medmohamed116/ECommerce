@@ -8,9 +8,11 @@ namespace ECommerce.Domain.Entities.Orders
 {
     public enum OrderStatus
     {
-        Pending =0,
-        PaymentRecieved,
-        PaymentFailed 
+        Pending =1,
+        processing,
+        Shipped,
+        Delivered,
+        Cancelled
 
     }
 }

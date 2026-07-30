@@ -33,6 +33,7 @@ namespace ECommerce.Domain.Entities.Orders
         public int DeliveryMethodId { get; set; }//FK
         public decimal GetTotal() => SubTotal + (DeliveryMethod?.Price ?? 0);  //method not mapped to data base SubTotal + DeliveryMethod Cost
 
-        
-    }
+        public string? PaymentIntentId { get;private set; }
+        public DateTimeOffset? PaidAtUtc { get; private set; }
+    } 
 }
