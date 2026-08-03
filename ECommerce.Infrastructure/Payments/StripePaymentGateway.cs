@@ -18,6 +18,7 @@ namespace ECommerce.Infrastructure.Payments
         public StripePaymentGateway(IOptions<PaymentGatewaySettings> options)
         {
             _paymentGatewaySettings = options.Value;
+            StripeConfiguration.ApiKey = options.Value.SecretKey;//
         }
 
         public async Task<PaymentIntentResult> CreatePaymentIntentAsync(decimal amount, string currency, CancellationToken ct = default)
