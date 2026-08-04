@@ -19,5 +19,8 @@ namespace ECommerce.Application.DTOs.OrderDTOs
         public decimal SubTotal { get; set; }
         public decimal DeliveryMethodCost { get; set; }
         public decimal Total { get; set; }  //Mapped Automatic From Order Cause itis name GetTotal by convintion
+
+        public string? PaymentIntentId { get; private set; }
+        public DateTimeOffset? PaidAtUtc { get; private set; }
     }
 }

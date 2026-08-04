@@ -8,13 +8,14 @@ namespace ECommerce.Domain.Entities.Orders
 {
     public class Order :BaseEntity<Guid>
     {
-        public Order(string buyerEmail, OrderAddress shipToAddress, ICollection<OrderItem> items, decimal subTotal, DeliveryMethod deliveryMethod )
+        public Order(string buyerEmail, OrderAddress shipToAddress, ICollection<OrderItem> items, decimal subTotal, DeliveryMethod deliveryMethod, string paymentIntentId )
         {
             BuyerEmail = buyerEmail;
             ShipToAddress = shipToAddress;
             Items = items;
             SubTotal = subTotal;
             DeliveryMethod = deliveryMethod;
+            PaymentIntentId = paymentIntentId;
         }
 
         private Order() // Empty parameterless ctor for EF Core // Order موجود بالفعل في قاعدة البيانات  إعادة تكوين

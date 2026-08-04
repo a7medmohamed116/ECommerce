@@ -31,13 +31,18 @@ namespace ECommerce.Application.Services
 
 
         public async Task<Result<OrderToReturnDto>> CreateOrderAsync(OrderDto orderDto, string email, CancellationToken ct = default)
-        {
+         {
             //items [order items] basket
             var basket = await _basketRepository.GetBasketAsync(orderDto.BasketId, ct);
             if (basket is null)
                 return Result<OrderToReturnDto>.Fail(Error.NotFound(Description: "Basket Not Found! "));
             if(basket.Items.Count ==0)
                 return Result<OrderToReturnDto>.Fail(Error.Validation(Description: "Basket Has No Products"));
+
+
+            var orderwithpaymentintentid = await _unitOfWork.GetRepository<Order, Guid>().GetByIdAsync(new PaymentSpecification(basket.PaymentIntentId),ct);
+            if(orderwithpaymentintentid is not null)
+                 _unitOfWork.GetRepository<Order, Guid>().Remove(orderwithpaymentintentid); // delete the order if exist with the same payment intent id to avoid duplicate orders
 
             var orderItems = new List<OrderItem>(basket.Items.Count);
             var ProuctsIds = basket.Items.Select(X => X.Id).ToHashSet();//
@@ -83,7 +88,7 @@ namespace ECommerce.Application.Services
             //subtotal => price of eachitem + quantity
             var subtotal = orderItems.Sum(X => X.Price * X.Quantity);
             //createOrder
-            var order = new Order(email, OrderAddress, orderItems, subtotal, deliveryMethod);
+            var order = new Order(email, OrderAddress, orderItems, subtotal, deliveryMethod,basket.PaymentIntentId);
             _unitOfWork.GetRepository<Order, Guid>().Add(order);
             var result = await _unitOfWork.SaveChangesAsync(ct);
             if (result == 0)
