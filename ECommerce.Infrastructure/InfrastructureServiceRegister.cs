@@ -123,7 +123,7 @@ namespace ECommerce.Infrastructure
 
 
 
-            services.AddScoped<IPaymentGateway, StripePaymentGateway>();
+            services.AddSingleton<IPaymentGateway, StripePaymentGateway>();
 
 
             return services;

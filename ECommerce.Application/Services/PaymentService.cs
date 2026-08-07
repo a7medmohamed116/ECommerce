@@ -90,6 +90,24 @@ namespace ECommerce.Application.Services
 
             return Result<BasketDto>.OK(_mapper.Map<BasketDto>(basket));
         }
+
+        public async Task PaymentFailed(string paymentIntentId)
+        {
+            var order = await _unitOfWork.GetRepository<Order, Guid>().GetByIdAsync(new PaymentSpecification(paymentIntentId));
+            if (order is null)
+                return;
+            order.Status = OrderStatus.PaymentFailed;
+            await _unitOfWork.SaveChangesAsync();
+        }
+
+        public async Task PaymentSucceeded(string paymentIntentId)
+        {
+            var order = await _unitOfWork.GetRepository<Order, Guid>().GetByIdAsync(new PaymentSpecification(paymentIntentId));
+            if (order is null)
+                return;
+            order.Status = OrderStatus.PaymentSuceeded;
+            await _unitOfWork.SaveChangesAsync();
+        }
     }
     //SecretKey → Used only by the backend to authenticate and communicate with the Stripe API.It must never be exposed to the frontend.
     //PaymentIntentId → The unique identifier of the Stripe PaymentIntent.It is typically stored in the Basket and later in the Order to track the payment.

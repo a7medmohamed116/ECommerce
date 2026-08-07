@@ -11,5 +11,8 @@ namespace ECommerce.Application.Contracts
     public interface IPaymentService
     {
         Task<Result<BasketDto>> CreateOrUpdatePaymentIntent(string basketId , CancellationToken ct =default );
+        Task PaymentSucceeded(string paymentIntentId);
+        Task PaymentFailed(string paymentIntentId);
+
     }
 }

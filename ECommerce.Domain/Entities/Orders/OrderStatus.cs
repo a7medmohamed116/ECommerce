@@ -12,7 +12,9 @@ namespace ECommerce.Domain.Entities.Orders
         processing,
         Shipped,
         Delivered,
-        Cancelled
+        Cancelled,
+        PaymentFailed,
+        PaymentSuceeded
 
     }
 }

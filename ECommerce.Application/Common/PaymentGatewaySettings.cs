@@ -10,5 +10,6 @@ namespace ECommerce.Application.Common
     {
         public string SecretKey { get; set; } = default!;
         public string DefaultCurrency { get; set; } = default!;
+        public string WebhookSecret { get; set; } 
     }
 }
