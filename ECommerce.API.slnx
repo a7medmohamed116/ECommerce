@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="AdminDashBoard/AdminDashBoard.csproj" Id="41e6c4a9-259d-45a3-906d-f10cc8e1f19e" />
   <Project Path="ECommerce.API/ECommerce.API.csproj" />
   <Project Path="ECommerce.Application/ECommerce.Application.csproj" />
   <Project Path="ECommerce.Domain/ECommerce.Domain.csproj" />
