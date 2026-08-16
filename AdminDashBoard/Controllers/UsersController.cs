@@ -2,12 +2,14 @@
 using AdminDashBoard.Models.Users;
 using ECommerce.Infrastructure.Identity.Data;
 using ECommerce.Infrastructure.Identity.Entities;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AdminDashBoard.Controllers
 {
+    [Authorize]
     public class UsersController : Controller
     {
         private readonly UserManager<ApplicationUser> _userManager;
