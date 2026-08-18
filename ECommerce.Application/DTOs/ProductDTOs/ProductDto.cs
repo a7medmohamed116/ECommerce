@@ -17,6 +17,8 @@ namespace ECommerce.Application.DTOs.ProductDTOs
         public string productBrand { get; set; }
         
         public string productType { get; set; }
-     
+        public int BrandId { get; set; }
+        public int TypeId { get; set; }
+
     }
 }

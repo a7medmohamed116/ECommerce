@@ -1,0 +1,39 @@
+﻿@model ProductViewModel
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<h1>Edit Product</h1>
+
+<div class="container">
+
+    <form method="post"
+          asp-action="Edit"
+          enctype="multipart/form-data">
+
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="PictureUrl" />
+
+        <partial name="CreateEditProductPartialView" model="Model" />
+
+        <br />
+        <br />
+
+        <input type="submit"
+               value="Save Changes"
+               class="btn btn-primary" />
+
+        <a asp-action="Index"
+           class="btn btn-light">
+            Back To List
+        </a>
+
+    </form>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+}

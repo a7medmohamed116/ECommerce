@@ -2,6 +2,7 @@
 using ECommerce.Application.Common;
 using ECommerce.Application.Contracts;
 using ECommerce.Application.DTOs.ProductDTOs;
+using ECommerce.Domain.Entities.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -53,7 +54,15 @@ namespace ECommerce.API.Controllers
             var result = await _productService.GetAllTypesAsync(ct);
             return ToActionResult(result);
         }
-       
+
+        [HttpPost]
+        public async Task<ActionResult<ProductDto>> Create ([FromForm] CreateProductDto model)
+        {
+            var result = await _productService.CreateAsync(model);
+
+            return ToActionResult(result);
+        }
+
 
     }
 }

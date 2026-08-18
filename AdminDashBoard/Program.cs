@@ -1,6 +1,11 @@
+using AdminDashBoard.Services;
+using ECommerce.Application.Contracts;
+using ECommerce.Application.Services;
+using ECommerce.Domain.Contracts;
 using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Identity.Data;
 using ECommerce.Infrastructure.Identity.Entities;
+using ECommerce.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +35,17 @@ namespace AdminDashBoard
             builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
                             .AddEntityFrameworkStores<StoreIdentityDbContext>()
                             .AddDefaultTokenProviders();
+            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+            builder.Services.AddHttpClient<ProductApiClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7270/");
+            });
+            builder.Services.AddHttpClient<AuthenticationApiClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7270/");
+            });
+            builder.Services.AddSession();
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 
@@ -45,7 +61,7 @@ namespace AdminDashBoard
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseSession();
             app.UseAuthentication();
             app.UseAuthorization();
 

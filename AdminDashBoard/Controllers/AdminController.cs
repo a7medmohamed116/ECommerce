@@ -1,19 +1,16 @@
-﻿using ECommerce.Application.DTOs.IdentityDTOs;
-using ECommerce.Infrastructure.Identity.Entities;
-using Microsoft.AspNetCore.Identity;
+﻿using AdminDashBoard.Services;
+using ECommerce.Application.DTOs.IdentityDTOs;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AdminDashBoard.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly AuthenticationApiClient _authenticationApiClient;
 
-        public AdminController(UserManager<ApplicationUser> userManager ,SignInManager<ApplicationUser> signInManager)
+        public AdminController(AuthenticationApiClient authenticationApiClient)
         {
-            _userManager = userManager;
-            _signInManager = signInManager; 
+            _authenticationApiClient = authenticationApiClient;
         }
 
          
@@ -26,25 +23,31 @@ namespace AdminDashBoard.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(LoginDto loginDto)
         {
-            var user = await _userManager.FindByEmailAsync(loginDto.Email);
-            if (user is null)
+            if (!ModelState.IsValid)
             {
-                ModelState.AddModelError("", "Invalid Login attpempt");
                 return View(loginDto);
             }
-            var result = await _signInManager.PasswordSignInAsync(user, loginDto.Password,false,false);
-            if (!result.Succeeded || (!await _userManager.IsInRoleAsync(user, "SuperAdmin"))){
-                ModelState.AddModelError("", "You are not authorized");
+            var result = await _authenticationApiClient.LoginAsync(loginDto);
+
+            if (result is null)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Invalid Email Or Password");
+
                 return View(loginDto);
             }
 
+            HttpContext.Session.SetString("AccessToken", result.Token);
             return RedirectToAction("Index", "Home");
+
         }
 
         public IActionResult Logout()
         {
-            _signInManager.SignOutAsync();
-            return RedirectToAction("Login");
+            HttpContext.Session.Remove("AccessToken");
+
+            return RedirectToAction(nameof(Login));
         }
     }
 }

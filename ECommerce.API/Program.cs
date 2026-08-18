@@ -40,6 +40,9 @@ namespace ECommerce.API
             }
 
             app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseRouting();
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

@@ -11,7 +11,7 @@ namespace ECommerce.Application.Specification
     public class ProductWithBrandAndTypeSpec :BaseSpecification<Product, int>
     {
         //get all
-        public ProductWithBrandAndTypeSpec(ProductQueryParams queryParams) : base
+        public ProductWithBrandAndTypeSpec(ProductQueryParams queryParams,bool forDashboard =false) : base
             (p => (!queryParams.BrandId.HasValue || p.BrandId == queryParams.BrandId) && 
             (!queryParams.TypeId.HasValue || p.TypeId == queryParams.TypeId) &&
             (string.IsNullOrWhiteSpace(queryParams.Search) ||p.Name.ToLower().Contains(queryParams.Search.ToLower())))
@@ -37,8 +37,8 @@ namespace ECommerce.Application.Specification
                     AddOrderBy(p => p.Id);
                     break;
             }
-
-            ApplyPagination(queryParams.PageSize , queryParams.PageIndex);
+            if(!forDashboard)
+                ApplyPagination(queryParams.PageSize , queryParams.PageIndex);
 
             
 

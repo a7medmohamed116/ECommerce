@@ -17,11 +17,57 @@ namespace ECommerce.Application.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
+        private readonly IImageService _imageService;
 
-        public ProductService(IUnitOfWork unitOfWork ,IMapper mapper )
+        public ProductService(IUnitOfWork unitOfWork ,IMapper mapper , IImageService imageService )
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
+            _imageService = imageService;
+        }
+
+        public async Task<Result<ProductDto>> CreateAsync(CreateProductDto model)
+        {
+            var brand = await _unitOfWork
+                .GetRepository<ProductBrand, int>()
+                .GetByIdAsync(model.BrandId);
+
+            if (brand is null)
+                return Result<ProductDto>.Fail(Error.NotFound ("Brand not found"));
+
+            var type = await _unitOfWork
+                .GetRepository<ProductType, int>()
+                .GetByIdAsync(model.TypeId);
+
+            if (type is null)
+                return Result<ProductDto>.Fail(Error.NotFound("Type not found"));
+
+            if (model.Image is null)
+                return Result<ProductDto>.Fail(Error.Validation("Product image is required"));
+
+            var pictureUrl = await _imageService.SaveImageAsync(
+                model.Image,
+                "products");
+
+            var product = new Product
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                BrandId = model.BrandId,
+                TypeId = model.TypeId,
+                PictureUrl = pictureUrl
+            };
+
+            _unitOfWork
+                .GetRepository<Product, int>()
+                .Add(product);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            var productDto = _mapper.Map<ProductDto>(product);
+
+            return Result<ProductDto>.OK(productDto);
         }
 
         public async Task<Result<IReadOnlyList<BrandDto>>> GetAllBrandsAsync(CancellationToken ct = default)
