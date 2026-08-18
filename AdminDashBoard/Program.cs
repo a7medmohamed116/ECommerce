@@ -6,6 +6,7 @@ using ECommerce.Infrastructure.Data;
 using ECommerce.Infrastructure.Identity.Data;
 using ECommerce.Infrastructure.Identity.Entities;
 using ECommerce.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,18 +28,20 @@ namespace AdminDashBoard
             });
 
 
-
-            builder.Services.AddDbContext<StoreIdentityDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("IdentityConnection"));
-            });
-            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
-                            .AddEntityFrameworkStores<StoreIdentityDbContext>()
-                            .AddDefaultTokenProviders();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddSession();
+            builder.Services
+                    .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                    .AddCookie(options =>
+                    {
+                        options.LoginPath = "/Admin/Login";
+                        options.AccessDeniedPath = "/Admin/AccessDenied";
+                    });
+
+            builder.Services.AddAuthorization();
+
             builder.Services.AddTransient<JwtAuthorizationHandler>();
             builder.Services.AddHttpClient<ProductApiClient>(client =>
             {
@@ -49,8 +52,7 @@ namespace AdminDashBoard
                 client.BaseAddress = new Uri("https://localhost:7270/");
             });
 
-
-
+        
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -66,6 +68,7 @@ namespace AdminDashBoard
 
             app.UseRouting();
             app.UseSession();
+           
             app.UseAuthentication();
             app.UseAuthorization();
 
