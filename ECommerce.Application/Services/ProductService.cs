@@ -103,5 +103,40 @@ namespace ECommerce.Application.Services
             var data = _mapper.Map<ProductDto>(product);
             return Result<ProductDto>.OK(data);
         }
+
+        public async Task<Result<ProductDto>> UpdateAsync(int id,UpdateProductDto model)
+        {
+            var product = await _unitOfWork.GetRepository<Product,int>()
+                .GetByIdAsync(id);
+
+            if (product == null)
+                return Result<ProductDto>.Fail(Error.NotFound(
+                    "Product not found"));
+
+            product.Name = model.Name;
+            product.Description = model.Description;
+            product.Price = model.Price;
+            product.BrandId = model.BrandId;
+            product.TypeId = model.TypeId;
+
+            if (model.Picture != null)
+            {
+                if (!string.IsNullOrEmpty(product.PictureUrl))
+                {
+                    _imageService.DeleteImageAsync(product.PictureUrl);
+                }
+
+                product.PictureUrl =
+                    await _imageService.SaveImageAsync(model.Picture, "products");
+            }
+
+            _unitOfWork.GetRepository<Product,int>().Update(product);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            var productDto = _mapper.Map<ProductDto>(product);
+
+            return Result<ProductDto>.OK(productDto);
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace ECommerce.Application.Contracts
     public interface IImageService
     {
         Task<string> SaveImageAsync(IFormFile image, string folderName);
+        void DeleteImageAsync(string image);
     }
 }

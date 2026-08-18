@@ -79,7 +79,39 @@ namespace AdminDashBoard.Services
         public async Task<ProductDto?> GetByIdAsync(int id)
         {
             return await _httpClient.GetFromJsonAsync<ProductDto>(
-                $"api/products/{id}");
+                $"api/Products/{id}");
+        }
+
+
+        public async Task<ProductDto?> UpdateAsync(int id, UpdateProductDto model)
+        {
+            using var form = new MultipartFormDataContent();
+
+            form.Add(new StringContent(model.Name), "Name");
+            form.Add(new StringContent(model.Description), "Description");
+            form.Add(new StringContent(model.Price.ToString()), "Price");
+            form.Add(new StringContent(model.BrandId.ToString()), "BrandId");
+            form.Add(new StringContent(model.TypeId.ToString()), "TypeId");
+
+            if (model.Picture != null)
+            {
+                var streamContent = new StreamContent(model.Picture.OpenReadStream());
+
+                form.Add(
+                    streamContent,
+                    "Picture",
+                    model.Picture.FileName
+                );
+            }
+
+            var response = await _httpClient.PutAsync(
+                $"api/products/{id}",
+                form
+            );
+
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<ProductDto>();
         }
     }
 }

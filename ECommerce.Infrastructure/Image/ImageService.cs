@@ -18,6 +18,22 @@ namespace ECommerce.Infrastructure.Image
             _environment = environment;
         }
 
+        public void DeleteImageAsync(string image)
+        {
+            if (string.IsNullOrEmpty(image))
+                return;
+
+            var filePath = Path.Combine(
+                _environment.WebRootPath,
+                "Files",
+                "images",
+                "products",
+                image);
+
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+        }
+
         public async Task<string> SaveImageAsync(
             IFormFile image,
             string folderName)
@@ -55,5 +71,7 @@ namespace ECommerce.Infrastructure.Image
 
             return $"images/{folderName}/{fileName}";
         }
+
+
     }
 }

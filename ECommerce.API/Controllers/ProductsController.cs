@@ -63,6 +63,14 @@ namespace ECommerce.API.Controllers
             return ToActionResult(result);
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductDto>> Update(int id,[FromForm] UpdateProductDto model)
+        {
+            var result = await _productService.UpdateAsync(id, model);
+
+            return ToActionResult(result);
+        }
+
 
     }
 }

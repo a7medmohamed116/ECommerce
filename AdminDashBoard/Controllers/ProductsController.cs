@@ -1,6 +1,7 @@
 ﻿using AdminDashBoard.Models.Products;
 using AdminDashBoard.Services;
 using ECommerce.Application.Common;
+using ECommerce.Application.DTOs.ProductDTOs;
 using ECommerce.Application.Specification;
 using ECommerce.Domain.Contracts;
 using ECommerce.Domain.Entities.Products;
@@ -68,9 +69,9 @@ namespace AdminDashBoard.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(int productid)
+        public async Task<IActionResult> Edit(int id)
         {
-            var product = await _productApiClient.GetByIdAsync(productid);
+            var product = await _productApiClient.GetByIdAsync(id);
             if (product is null)
                 return NotFound();
             var model = new ProductViewModel
@@ -89,8 +90,30 @@ namespace AdminDashBoard.Controllers
 
             ViewBag.Brands = new SelectList(brands, "Id", "Name", model.BrandId);
             ViewBag.Types = new SelectList(types, "Id", "Name", model.TypeId);
+            return View(model);
+        }
 
-            return View(product);
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(ProductViewModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var updateDto = new UpdateProductDto
+            {
+                Name = model.Name,
+                Description = model.Description,
+                Price = model.Price,
+                BrandId = model.BrandId,
+                TypeId = model.TypeId,
+                Picture = model.Image
+            };
+
+            await _productApiClient.UpdateAsync(model.Id, updateDto);
+
+            return RedirectToAction(nameof(Index));
         }
 
 

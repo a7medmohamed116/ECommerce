@@ -12,7 +12,7 @@ namespace AdminDashBoard.Models.Products
         [Required(ErrorMessage = "Description name is required")]
 
         public string Description { get; set; }
-        public IFormFile Image { get; set; }
+        public IFormFile? Image { get; set; }
         public string PictureUrl { get; set; }
 
         [Required(ErrorMessage = "Product Price is required")]
@@ -21,10 +21,10 @@ namespace AdminDashBoard.Models.Products
         [Required(ErrorMessage = "Product brand id is required")]
 
         public int BrandId { get; set; }
-        public ProductBrand Brand { get; set; }
+        public ProductBrand? Brand { get; set; }
         [Required(ErrorMessage = "Product type id is required")]
 
         public int TypeId  { get; set; }
-        public ProductType Type { get; set; }
+        public ProductType? Type { get; set; }
     }
 }
