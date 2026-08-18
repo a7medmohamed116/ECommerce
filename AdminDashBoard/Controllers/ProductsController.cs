@@ -117,5 +117,21 @@ namespace AdminDashBoard.Controllers
         }
 
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Deletea(int id)
+        {
+            var result = await _productApiClient.DeleteAsync(id);
+
+            if (!result)
+            {
+                TempData["Error"] = "Failed to delete product.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
     }
 }

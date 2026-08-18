@@ -70,6 +70,28 @@ namespace ECommerce.Application.Services
             return Result<ProductDto>.OK(productDto);
         }
 
+        public async Task<Result<bool>> DeleteAsync(int id)
+        {
+            var product = await _unitOfWork
+                .GetRepository<Product,int>()
+                .GetByIdAsync(id);
+
+            if (product == null)
+                return Result<bool>.Fail(Error.NotFound(
+                    "Product not found"));
+
+            if (!string.IsNullOrEmpty(product.PictureUrl))
+            {
+                _imageService.DeleteImageAsync(product.PictureUrl);
+            }
+
+            _unitOfWork.GetRepository<Product,int>().Remove(product);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return Result<bool>.OK(true);
+        }
+
         public async Task<Result<IReadOnlyList<BrandDto>>> GetAllBrandsAsync(CancellationToken ct = default)
         {
             var brands = await _unitOfWork.GetRepository<ProductBrand, int>().GetAllAsync(ct);

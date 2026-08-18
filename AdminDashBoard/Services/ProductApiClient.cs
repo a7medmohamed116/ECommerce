@@ -113,5 +113,12 @@ namespace AdminDashBoard.Services
 
             return await response.Content.ReadFromJsonAsync<ProductDto>();
         }
+        public async Task<bool> DeleteAsync(int id)
+        {
+            var response = await _httpClient.DeleteAsync(
+                $"api/products/{id}");
+
+            return response.IsSuccessStatusCode;
+        }
     }
 }
