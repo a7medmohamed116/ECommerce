@@ -36,16 +36,20 @@ namespace AdminDashBoard
                             .AddEntityFrameworkStores<StoreIdentityDbContext>()
                             .AddDefaultTokenProviders();
             builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.AddSession();
+            builder.Services.AddTransient<JwtAuthorizationHandler>();
             builder.Services.AddHttpClient<ProductApiClient>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7270/");
-            });
+            }).AddHttpMessageHandler<JwtAuthorizationHandler>(); 
             builder.Services.AddHttpClient<AuthenticationApiClient>(client =>
             {
                 client.BaseAddress = new Uri("https://localhost:7270/");
             });
-            builder.Services.AddSession();
-            builder.Services.AddHttpContextAccessor();
+
+
 
             var app = builder.Build();
 
