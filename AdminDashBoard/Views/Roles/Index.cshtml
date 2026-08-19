@@ -1,4 +1,4 @@
-﻿@model IEnumerable<IdentityRole>
+﻿@model IEnumerable<RoleViewModel>
 
 
 <h1 class="mt-2 text-center">All Roles</h1>
@@ -24,7 +24,7 @@
                     <td>@role.Name</td>
                     <td>
                         <a class="btn btn-outline-warning" asp-action="Edit" asp-route-id="@role.Id"> Edit </a>
-                        <a class="btn btn-outline-danger" asp-action="Delete" asp-route-id="@role.Id"> Delete </a>
+                        <a class="btn btn-outline-danger" asp-action="Deleteo" asp-route-id="@role.Id"> Delete </a>
                     </td>
                 </tr>
             }

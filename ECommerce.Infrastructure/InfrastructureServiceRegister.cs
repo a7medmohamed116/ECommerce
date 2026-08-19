@@ -126,6 +126,7 @@ namespace ECommerce.Infrastructure
 
             services.AddSingleton<IPaymentGateway, StripePaymentGateway>();
             services.AddScoped<IImageService, ImageService>();
+            services.AddScoped<IRoleService, RoleService>();
 
 
             return services;

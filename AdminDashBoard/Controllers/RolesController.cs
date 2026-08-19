@@ -1,4 +1,7 @@
 ﻿using AdminDashBoard.Models.Roles;
+using AdminDashBoard.Services;
+using ECommerce.Application.Common;
+using ECommerce.Application.DTOs.RolesDto;
 using ECommerce.Infrastructure.Identity.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -7,82 +10,88 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AdminDashBoard.Controllers
 {
-    [Authorize]
     public class RolesController : Controller
     {
-        private readonly RoleManager<IdentityRole> _roleManager; 
+        private readonly RoleApiClient _roleApiClient;
 
-        public RolesController(RoleManager<IdentityRole> roleManager)
+        public RolesController(RoleApiClient roleApiClient)
         {
-            _roleManager = roleManager;
+            _roleApiClient = roleApiClient;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(CancellationToken ct = default)
         {
-            var roles =await _roleManager.Roles.ToListAsync();
-            return View(roles);
+            var roles = await _roleApiClient.GetAllAsync(ct);
+            var model = roles.Select(r => new RoleViewModel
+            {
+                Id = r.Id,
+                Name = r.Name
+            }).ToList();
+
+            return View(model);
         }
 
-        public async Task<IActionResult> Create(RoleViewModel model)
+        [HttpPost]
+        public async Task<IActionResult> Createo( RoleViewModel model, CancellationToken ct = default)
         {
             if (ModelState.IsValid)
             {
-                var isexit = await _roleManager.RoleExistsAsync(model.Name);
-                if (!isexit)
-                {
-                    await _roleManager.CreateAsync(new IdentityRole(model.Name));
-                    return RedirectToAction("Index");
-                }
-                ModelState.AddModelError("Name", "Role Already Exist");
-            }
-            return View(nameof(Index), await _roleManager.Roles.ToListAsync());// RedirectToAction("Index") makes a new HTTP request to the Index action. return View(nameof(Index), roles) renders the View directly within the current request.
-            //That's why, in the error case, you need to pass the roles yourself to the View.
-        }
+                var result = await _roleApiClient.CreateAsync(new CreateRoleDto() { Name = model.Name }, ct);
 
-        public async Task<IActionResult> Delete(string id)
-        {
-            var role = await _roleManager.FindByIdAsync(id);
-            if(role is not null)
-            {
-                await _roleManager.DeleteAsync(role);
-            }
-            return RedirectToAction("Index");
-        }
-        public async Task<IActionResult> Edit(string id)
-        {
-            var role = await _roleManager.FindByIdAsync(id);
-            if(role is null)
-            {
-                ModelState.AddModelError("Id", "No Role with this id");
-                return RedirectToAction("Index");
-            }
-            var updateRoleViewModel = new UpdateRoleViewModel() { Id = id, Name = role.Name! };
 
-            return View(updateRoleViewModel);
+                if (result)
+                    return RedirectToAction(nameof(Index));
+            }
+            ModelState.AddModelError("Name", "Role ALready Exist");
+            var roles = await _roleApiClient.GetAllAsync(ct);
+            var roleModels = roles.Select(r => new RoleViewModel
+            {
+                Id = r.Id,
+                Name = r.Name
+            }).ToList();
+            return View(nameof(Index), roleModels);
+        }
+        // RedirectToAction("Index") makes a new HTTP request to the Index action. return View(nameof(Index), roles) renders the View directly within the current request.
+        //That's why, in the error case, you need to pass the roles yourself to the View.
+        public async Task<IActionResult> Deleteo(string id,CancellationToken ct = default)
+        {
+            await _roleApiClient.DeleteAsync(id, ct);
+
+            return RedirectToAction(nameof(Index));
+        }
+        public async Task<IActionResult> Edit(string id,CancellationToken ct = default)
+        {
+            var role = await _roleApiClient.GetByIdAsync(id, ct);
+
+            if (role is null)
+                return RedirectToAction(nameof(Index));
+
+            var model = new UpdateRoleViewModel
+            {
+                Id = role.Id,
+                Name = role.Name
+            };
+
+            return View(model);
         }
         [HttpPost]
-        public async Task<IActionResult> Edit(UpdateRoleViewModel model)
+        public async Task<IActionResult> Edit(UpdateRoleViewModel model,CancellationToken ct = default)
         {
             if (ModelState.IsValid)
             {
-                var roleexist = await _roleManager.RoleExistsAsync(model.Name); 
-                if (!roleexist)
-                {
-                    var role = await _roleManager.FindByIdAsync(model.Id);
-                    if (role is not null)
+                var result = await _roleApiClient.UpdateAsync(
+                    model.Id,
+                    new RoleDto
                     {
-                        role.Name = model.Name;
-                        await _roleManager.UpdateAsync(role);
-                        return RedirectToAction("Index");
-                    }
-                    
-                }
+                        Id = model.Id,
+                        Name = model.Name
+                    },
+                    ct);
 
+                if (result)
+                    return RedirectToAction(nameof(Index));
             }
-            ModelState.AddModelError("Name", "Role Already Exist");
+
             return View(model);
-
-
-
         }
     }
 }

@@ -21,15 +21,6 @@ namespace AdminDashBoard
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-
-            builder.Services.AddDbContext<StoreDbContext>(options =>
-            {
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-            });
-
-
-            builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
-
             builder.Services.AddHttpContextAccessor();
             builder.Services.AddSession();
             builder.Services
@@ -55,7 +46,10 @@ namespace AdminDashBoard
             {
                 client.BaseAddress = new Uri("https://localhost:7270/");
             }).AddHttpMessageHandler<JwtAuthorizationHandler>();
-
+            builder.Services.AddHttpClient<RoleApiClient, RoleApiClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7270/");
+            }).AddHttpMessageHandler<JwtAuthorizationHandler>();
 
             var app = builder.Build();
 
