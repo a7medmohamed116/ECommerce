@@ -17,9 +17,12 @@ namespace ECommerce.Infrastructure.Identity.Services
     public class IdentityService : IIdentityService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        public IdentityService(UserManager<ApplicationUser> userManager )
+        private readonly RoleManager<IdentityRole> _roleManager;
+
+        public IdentityService(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager )
         {
             _userManager = userManager;
+            _roleManager = roleManager;
         }
 
         public async Task<Result<bool>> CheckEmailExistAsync(string email, CancellationToken ct = default)
@@ -66,6 +69,33 @@ namespace ECommerce.Infrastructure.Identity.Services
             
 
             
+        }
+
+        public async Task<Result<IdentityUserResult>> FindUserByIdAsync(string userId,CancellationToken ct = default)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is null)
+                return Result<IdentityUserResult>.Fail(
+                    Error.NotFound("Not Found", "User not found"));
+
+            return Result<IdentityUserResult>.OK(
+                new IdentityUserResult(
+                    user.Id,
+                    user.DisplayName,
+                    user.Email,
+                    user.UserName));
+        }
+
+        public async Task<Result<IReadOnlyList<IdentityRoleResult>>> GetAllRolesAsync(CancellationToken ct = default)
+        {
+            var roles = await _roleManager.Roles
+                .Select(r => new IdentityRoleResult(
+                    r.Id,
+                    r.Name!))
+                .ToListAsync(ct);
+
+            return Result<IReadOnlyList<IdentityRoleResult>>.OK(roles);
         }
 
         public async Task<Result<IReadOnlyList<IdentityUserResult>>> GetAllUsersAsync(CancellationToken ct = default)
@@ -152,6 +182,55 @@ namespace ECommerce.Infrastructure.Identity.Services
             return Result<AddressDto>.OK(new AddressDto() { City = address.City, FirstName = address.FirstName, LastName = address.LastName, Street = address.Street  ,Country = address.Country});
             
 
+        }
+
+        public async Task<Result<bool>> UpdateUserRolesAsync(string userId,IEnumerable<string> selectedRoles,CancellationToken ct = default)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user is null)
+                return Result<bool>.Fail(
+                    Error.NotFound("Not Found", "User not found"));
+
+            var currentRoles = await _userManager.GetRolesAsync(user);
+
+            var selectedRolesList = selectedRoles.ToList();
+
+            foreach (var role in currentRoles)
+            {
+                if (!selectedRolesList.Contains(role))
+                {
+                    var result = await _userManager.RemoveFromRoleAsync(user, role);
+
+                    if (!result.Succeeded)
+                    {
+                        var errors = result.Errors
+                            .Select(x => new Error(x.Code, x.Description))
+                            .ToList();
+
+                        return Result<bool>.Fail(errors);
+                    }
+                }
+            }
+
+            foreach (var role in selectedRolesList)
+            {
+                if (!currentRoles.Contains(role))
+                {
+                    var result = await _userManager.AddToRoleAsync(user, role);
+
+                    if (!result.Succeeded)
+                    {
+                        var errors = result.Errors
+                            .Select(x => new Error(x.Code, x.Description))
+                            .ToList();
+
+                        return Result<bool>.Fail(errors);
+                    }
+                }
+            }
+
+            return Result<bool>.OK(true);
         }
     }
 }

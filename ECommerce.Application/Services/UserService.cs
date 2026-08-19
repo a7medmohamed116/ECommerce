@@ -1,5 +1,6 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.Contracts;
+using ECommerce.Application.DTOs.RolesDto;
 using ECommerce.Application.DTOs.UsersDto;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,61 @@ namespace ECommerce.Application.Services
             }
 
             return Result<IReadOnlyList<UserToManageDto>>.OK(result);
+        }
+
+        public async Task<Result<UserRoleDto>> GetUserForEditAsync(
+     string userId,
+     CancellationToken ct = default)
+        {
+            var userResult = await _identityService.FindUserByIdAsync(userId, ct);
+
+            if (!userResult.IsSuccess)
+                return Result<UserRoleDto>.Fail(userResult.Errors);
+
+            var rolesResult = await _identityService.GetAllRolesAsync(ct);
+
+            if (!rolesResult.IsSuccess)
+                return Result<UserRoleDto>.Fail(rolesResult.Errors);
+
+            var userRolesResult = await _identityService.GetUserRoles(
+                userResult.data.Email,
+                ct);
+
+            if (!userRolesResult.IsSuccess)
+                return Result<UserRoleDto>.Fail(userRolesResult.Errors);
+
+            var userRoles = userRolesResult.data;
+
+            var result = new UserRoleDto
+            {
+                UserId = userResult.data.Id,
+                UserName = userResult.data.UserName,
+                Roles = rolesResult.data
+                    .Select(role => new UpdateRoleDto
+                    {
+                        Id = role.Id,
+                        Name = role.Name,
+                        IsSelected = userRoles.Contains(role.Name)
+                    })
+                    .ToList()
+            };
+
+            return Result<UserRoleDto>.OK(result);
+        }
+
+        public async Task<Result<bool>> UpdateUserRolesAsync(
+    UserRoleDto model,
+    CancellationToken ct = default)
+        {
+            var selectedRoles = model.Roles
+                .Where(x => x.IsSelected)
+                .Select(x => x.Name)
+                .ToList();
+
+            return await _identityService.UpdateUserRolesAsync(
+                model.UserId,
+                selectedRoles,
+                ct);
         }
     }
 }

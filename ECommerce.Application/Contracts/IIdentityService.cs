@@ -1,5 +1,6 @@
 ﻿using ECommerce.Application.Common;
 using ECommerce.Application.DTOs.IdentityDTOs;
+using ECommerce.Application.DTOs.RolesDto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,5 +20,19 @@ namespace ECommerce.Application.Contracts
         Task<Result<AddressDto>> UpdateAddress(AddressDto addressDto ,string email,CancellationToken ct = default);
 
         Task<Result<IReadOnlyList<IdentityUserResult>>> GetAllUsersAsync(CancellationToken ct = default);
+
+
+
+       Task<Result<IdentityUserResult>> FindUserByIdAsync(string userId,CancellationToken ct = default);
+
+        Task<Result<IReadOnlyList<IdentityRoleResult>>> GetAllRolesAsync(CancellationToken ct = default);
+
+        Task<Result<bool>> UpdateUserRolesAsync(string userId,IEnumerable<string> selectedRoles,CancellationToken ct = default);
+
+
+
+
+
+
     }
 }
