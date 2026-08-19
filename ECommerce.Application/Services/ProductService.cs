@@ -110,6 +110,13 @@ namespace ECommerce.Application.Services
             return Result<PaginatedResult<ProductDto>>.OK(result);
         }
 
+        public async Task<Result<IReadOnlyList<ProductDto>>> GetAllProductsForAdminAsync(ProductQueryParams queryParams, CancellationToken ct = default)
+        {
+            var spec = new ProductWithBrandAndTypeSpec(queryParams, true);
+            var products = await _unitOfWork.GetRepository<Product, int>().GetAllAsync(spec, ct);
+            return Result<IReadOnlyList<ProductDto>>.OK(_mapper.Map<IReadOnlyList<ProductDto>>(products));
+        }
+
         public async Task<Result<IReadOnlyList<TypeDto>>> GetAllTypesAsync(CancellationToken ct = default)
         {
             var types = await _unitOfWork.GetRepository<ProductType, int>().GetAllAsync(ct);

@@ -21,10 +21,10 @@ namespace AdminDashBoard.Models.Products
         [Required(ErrorMessage = "Product brand id is required")]
 
         public int BrandId { get; set; }
-        public ProductBrand? Brand { get; set; }
+        public string? Brand { get; set; }
         [Required(ErrorMessage = "Product type id is required")]
 
         public int TypeId  { get; set; }
-        public ProductType? Type { get; set; }
+        public string? Type { get; set; }
     }
 }

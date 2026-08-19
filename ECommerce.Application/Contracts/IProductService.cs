@@ -17,5 +17,7 @@ namespace ECommerce.Application.Contracts
         Task<Result<ProductDto>> CreateAsync(CreateProductDto model);
         Task<Result<ProductDto>> UpdateAsync(int id, UpdateProductDto model);
         Task<Result<bool>> DeleteAsync(int id);
+        Task<Result<IReadOnlyList<ProductDto>>> GetAllProductsForAdminAsync(ProductQueryParams queryParams, CancellationToken ct = default);
+        
     }
 }

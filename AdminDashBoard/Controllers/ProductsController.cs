@@ -2,8 +2,6 @@
 using AdminDashBoard.Services;
 using ECommerce.Application.Common;
 using ECommerce.Application.DTOs.ProductDTOs;
-using ECommerce.Application.Specification;
-using ECommerce.Domain.Contracts;
 using ECommerce.Domain.Entities.Products;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -13,32 +11,31 @@ namespace AdminDashBoard.Controllers
 {
     public class ProductsController : Controller
     {
-        private readonly IUnitOfWork _unitOfWork;
+
         private readonly ProductApiClient _productApiClient;
 
-        public ProductsController(IUnitOfWork unitOfWork ,ProductApiClient productApiClient)
+        public ProductsController(ProductApiClient productApiClient)
         {
-            _unitOfWork = unitOfWork;
             _productApiClient = productApiClient;
         }
         public async Task<IActionResult> Index()
         {
-            var productRepo =  _unitOfWork.GetRepository<Product, int>();
-            var queryParames = new ProductQueryParams();
-            var spec = new ProductWithBrandAndTypeSpec(queryParames,true);
-            var products = await productRepo.GetAllAsync(spec);
-            var productModel = products.Select(P => new ProductViewModel
+            var products = await _productApiClient.GetAllAsync();
+
+            var productModel = products?.Select(p => new ProductViewModel
             {
-                Id = P.Id,
-                Name = P.Name,
-                Description = P.Description,
-                Price = P.Price,
-                PictureUrl = $"https://localhost:7270/Files/{P.PictureUrl.TrimStart('/')}",
-                BrandId = P.BrandId,
-                TypeId = P.TypeId,
-                Brand = P.productBrand,
-                Type = P.productType
-            });          
+                Id = p.Id,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                PictureUrl = p.PictureUrl,
+                BrandId = p.BrandId,
+                TypeId = p.TypeId,
+                Brand = p.productBrand,
+                Type = p.productType
+                
+            });
+
             return View(productModel);
         }
 

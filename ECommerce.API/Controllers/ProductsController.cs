@@ -2,6 +2,7 @@
 using ECommerce.Application.Common;
 using ECommerce.Application.Contracts;
 using ECommerce.Application.DTOs.ProductDTOs;
+using ECommerce.Application.Specification;
 using ECommerce.Domain.Entities.Products;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -75,6 +76,19 @@ namespace ECommerce.API.Controllers
         public async Task<ActionResult<bool>> Delete(int id)
         {
             var result = await _productService.DeleteAsync(id);
+
+            return ToActionResult(result);
+        }
+
+
+        [HttpGet("admin")]
+        public async Task<ActionResult<IReadOnlyList<ProductDto>>> GetAllProductsForAdmin(CancellationToken ct = default)
+        {
+            var queryParams = new ProductQueryParams();
+
+            var spec = new ProductWithBrandAndTypeSpec(queryParams, true);
+
+            var result = await _productService.GetAllProductsForAdminAsync(queryParams, ct);
 
             return ToActionResult(result);
         }

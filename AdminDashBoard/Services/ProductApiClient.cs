@@ -1,4 +1,5 @@
 ﻿using AdminDashBoard.Models.Products;
+using ECommerce.Application.Common;
 using ECommerce.Application.DTOs.ProductDTOs;
 
 namespace AdminDashBoard.Services
@@ -119,6 +120,12 @@ namespace AdminDashBoard.Services
                 $"api/products/{id}");
 
             return response.IsSuccessStatusCode;
+        }
+
+        public async Task<IReadOnlyList<ProductDto>?> GetAllAsync()
+        {
+            return await _httpClient.GetFromJsonAsync<IReadOnlyList<ProductDto>>(
+                "api/products/admin") ;
         }
     }
 }
