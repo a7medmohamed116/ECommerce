@@ -68,6 +68,19 @@ namespace ECommerce.Infrastructure.Identity.Services
             
         }
 
+        public async Task<Result<IReadOnlyList<IdentityUserResult>>> GetAllUsersAsync(CancellationToken ct = default)
+        {
+            var users = await _userManager.Users
+                .Select(user => new IdentityUserResult(
+                    user.Id,
+                    user.DisplayName,
+                    user.Email,
+                    user.UserName))
+                .ToListAsync(ct);
+
+            return Result<IReadOnlyList<IdentityUserResult>>.OK(users);
+        }
+
         public async Task<Result<AddressDto>> GetUserAddress(string email, CancellationToken ct = default)
         {
             var user = _userManager.Users.Include(X => X.Address).FirstOrDefault(X => X.Email == email);

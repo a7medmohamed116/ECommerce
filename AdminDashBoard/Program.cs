@@ -51,8 +51,12 @@ namespace AdminDashBoard
             {
                 client.BaseAddress = new Uri("https://localhost:7270/");
             });
+            builder.Services.AddHttpClient<UserApiClient, UserApiClient>(client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7270/");
+            }).AddHttpMessageHandler<JwtAuthorizationHandler>();
 
-        
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
